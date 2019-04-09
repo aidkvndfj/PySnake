@@ -26,6 +26,9 @@ spawnFood = bool(False) # weather or not there is a food on screen
 tailsX = [] # the x pos of the tail pieces
 tailsY = [] # the y pos of the tail pieces
 
+# Other Variables
+tailNum = int() # The tail number that is being updated
+
 # Initalize Pygame
 pygame.init()
 pygame.font.init()
@@ -38,7 +41,7 @@ pygame.display.set_caption("PySnake") # Name the window 'PySnake'
 clock = pygame.time.Clock()
 
 #~~~~~~~~~~ Classes ~~~~~~~~~#
-class Head(pygame.sprtie.Sprite):
+class Head(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         # Head Setup
@@ -110,6 +113,11 @@ class Food(pygame.sprite.Sprite):
         self.rect.centerx = x # Set the x to given x
         self.rect.centery = y # Set the y to given y
 
+        def ate(self):
+            global spawnFood
+            spawnFood = False # There is no longer a food spawned
+            self.kill() # Kill the current food
+
 #~~~~~~~ Sprites Init ~~~~~~~#
 # Sprite Groups
 tailPieces = pygame.sprite.Group()
@@ -125,8 +133,63 @@ for i in range(tailSize): # Make the tail
 #~~~~~~ Main Game Loop ~~~~~~#
 running = True
 while (running):
-    clock.time(FPS) # Set the Frames Per Second
+    clock.tick(FPS) # Set the Frames Per Second
 
+    # Check to see if the snake has collided with itself, or the wall
+    if (pygame.sprite.spritecollide(head, tailPieces, False) or head.rect.x > WIDTH or head.rect.x < 0 or head.rect.y > HEIGHT or head.rect.y < 0):
+        running = False
+
+    # Check events whenever some input is given
     for event in pygame.event.get():
-        if (event.type == pygame.QUIT):
+        if (event.type == pygame.QUIT): # If the 'X' in the corner is clicked exit
             running = False
+        if (event.type == pygame.KEYDOWN): # If the key is pressed
+            key = pygame.key.get_pressed() # Get the key pressed
+            if (key[pygame.K_UP]): # If up move up
+                head.move("UP")
+            if (key[pygame.K_DOWN]): # If down move down
+                head.move("DOWN")
+            if (key[pygame.K_LEFT]): # If left move left
+                head.move("LEFT")
+            if (key[pygame.K_RIGHT]): # If right move right
+                head.move("RIGHT")
+
+        # Edit Tail Positions
+        for i in range(tailPieces): # Repeats based off how many tail pieces there are
+            if (i < tailPieces - 1): # while i is 1 less than the number of tail pieces
+                tailsX[(tailPieces - 1) - i] = tailsX[(tailPieces - 1) - (i + 1)] # Take one elenemt and move it to the right
+                tailsY[(tailPieces - 1) - i] = tailsX[(tailPieces - 1) - (i + 1)] # Take one elenemt and move it to the right
+            else:
+                tailsX[0] = head.rect.centerx # Set the first element to the new x
+                tailsY[0] = head.rect.centery # Set the first element to the new y
+
+        # Update Tail Posiiton
+        tailNum = 0 # Set the tail it is updating to 0 (a.k.a 1)
+        for i in tailPieces: # for however many tail pieces there are
+            i.update(tailsX[tailNum], tailsY[tailNum], tailnum) # Update the Tail
+            tailNum += 1 # Go on to the next tail piece
+
+        # Spawn Food
+        if (not spawnFood): # If there is no food on screen
+            # Make a food at a random x and y, that is 1 grid away from the wall, and step 20 so that it is always in line with the snake
+            food = Food(random.randrange(20, WIDTH - 20, 20), random.randrange(20, HEIGHT - 20, 20))
+
+        # Check for food eaten
+        if (pygame.sprite.collide_rect(head, food) == 1): # If the head is colliding with a food
+            food.ate() # Get rid of food
+            head.eat() # Add 1 to tail
+
+        # Update the heads pos
+        head.update()
+
+
+        screen.fill(BLACK) # Gets rid of everything on the screen
+        head.draw(screen) # Draws the head
+        food.draw(screen) # Draws the food
+        blocks.draw(screen) # Draws the blocks
+
+        pygame.dispaly.flip() # Flips the display to show new frame
+
+# Quit out of pygame
+pygame.quit()
+pygame.font.quit()
