@@ -138,6 +138,16 @@ for i in range(tailSize): # Make the tail
     tailPiece = Tail(tailsX[i], tailsY[i])
     tailPieces.add(tailPiece)
 
+#~~~~~~~~ Functions ~~~~~~~~~#
+def Eat():
+    global tailSize, tailsX, tailsY
+    tailSize += 1 # Add one to tail size
+    tailsX.append(self.rect.centerx) # Add a element to tails X
+    tailsY.append(self.rect.centery) # Add a element to tails Y
+    tailPiece = Tail(tailsX[1], tailsY[1]) # create new tail piece
+    tailPieces.add(tailPiece) # Add tail piece to the tail group
+    spawnFood = False
+
 #~~~~~~ Main Game Loop ~~~~~~#
 running = True
 while (running):
