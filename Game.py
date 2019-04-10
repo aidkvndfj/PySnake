@@ -187,8 +187,6 @@ while (running):
         food.ate() # Get rid of food
         head.eat() # Add 1 to tail
 
-
-
     # Draw Frame
     screen.fill(BLACK) # Gets rid of everything on the screen
     allSprites.draw(screen) # Draws the head
