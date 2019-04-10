@@ -28,6 +28,7 @@ tailsY = [] # the y pos of the tail pieces
 
 # Other Variables
 tailNum = int()
+score = 0
 
 # Initalize Pygame
 pygame.init()
@@ -39,6 +40,10 @@ pygame.display.set_caption("PySnake") # Name the window 'PySnake'
 
 # Clock Setup For FPS
 clock = pygame.time.Clock()
+
+# Font/Text Setup
+scoreFont = pygame.font.SysFont("Halvetica", 20)
+scoreText = scoreFont.render("Score: {0}".format(score), False, (WHITE))
 
 #~~~~~~~~~~ Classes ~~~~~~~~~#
 class Head(pygame.sprite.Sprite):
@@ -139,7 +144,7 @@ while (running):
     clock.tick(FPS) # Set the Frames Per Second
 
     # Check to see if the snake has collided with itself, or the wall
-    if (pygame.sprite.spritecollide(head, tailPieces, False) or head.rect.x > WIDTH or head.rect.x < 0 or head.rect.y > HEIGHT or head.rect.y < 0):
+    if (pygame.sprite.spritecollide(head, tailPieces, False) or head.rect.x > WIDTH - 10 or head.rect.x < 10 or head.rect.y > HEIGHT - 10 or head.rect.y < 10):
         running = False
 
     # Check events whenever some input is given
@@ -186,11 +191,14 @@ while (running):
     if (pygame.sprite.collide_rect(head, food) == 1): # If the head is colliding with a food
         food.ate() # Get rid of food
         head.eat() # Add 1 to tail
+        score += 1
+        scoreText = scoreFont.render("Score: {0}".format(score), False, (WHITE))
 
     # Draw Frame
     screen.fill(BLACK) # Gets rid of everything on the screen
     allSprites.draw(screen) # Draws the head
     tailPieces.draw(screen) # Draws the blocks
+    screen.blit(scoreText, (10, 10))
 
     # Show Frame
     pygame.display.flip() # Flips the display to show new frame
