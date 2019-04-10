@@ -1,1 +1,5 @@
+Random_Games/dist/
+Random_Games/Build/
+Random_Games/build/
+*.spec
 *.pyc
