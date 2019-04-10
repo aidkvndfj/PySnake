@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0, 'Classes')
 from HeadClass import *
 from TailClass import *
+from FoodClass import *
 
 # Constants
 WIDTH = 600 # Width of screen
@@ -49,38 +50,6 @@ clock = pygame.time.Clock()
 scoreFont = pygame.font.SysFont("Halvetica", 20)
 scoreText = scoreFont.render("Score: {0}".format(score), False, (WHITE))
 
-#~~~~~~~~~~ Classes ~~~~~~~~~#
-# class Tail(pygame.sprite.Sprite):
-#     def __init__(self, x, y):
-#         pygame.sprite.Sprite.__init__(self)
-#         # Tail piece setup
-#         self.image = pygame.Surface((15, 15)) # Make it the same size as the head
-#         self.image.fill(BLUE) # Make it blue
-#         self.rect = self.image.get_rect() # Set the rect to be the same as the image
-#         self.rect.centerx = x # Starting x position at given
-#         self.rect.centery = y # Starting y position at given
-#
-#     def update(self, x, y, colorScale):
-#         self.rect.centerx = x # update the x based off given
-#         self.rect.centery = y # update the y based off given
-#         # Scale the color based on where in tail piece is
-#         self.image.fill((255.0 / ((colorScale + 2) / 1), 255.0 / ((colorScale + 2) / 1.2), 255.0 / ((colorScale + 2) / 2)))
-
-class Food(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        # Food image Setup
-        self.image = pygame.Surface((12, 12)) # Make the food slightly smaller than the head/tail
-        self.image.fill(WHITE) # Make the food white
-        self.rect = self.image.get_rect() #set the rect to the image rect
-        self.rect.centerx = x # Set the x to given x
-        self.rect.centery = y # Set the y to given y
-
-    def ate(self):
-        global spawnFood
-        spawnFood = False # There is no longer a food spawned
-        self.kill() # Kill the current food
-
 #~~~~~~~ Sprites Init ~~~~~~~#
 # Sprite Groups
 tailPieces = pygame.sprite.Group()
@@ -98,7 +67,7 @@ for i in range(tailSize): # Make the tail
 
 #~~~~~~~~ Functions ~~~~~~~~~#
 def Eat():
-    global tailSize, tailsX, tailsY
+    global tailSize, tailsX, tailsY, spawnFood
     tailSize += 1 # Add one to tail size
     tailsX.append(head.rect.centerx) # Add a element to tails X
     tailsY.append(head.rect.centery) # Add a element to tails Y
@@ -109,6 +78,7 @@ def Eat():
 #~~~~~~ Main Game Loop ~~~~~~#
 running = True
 while (running):
+    # print(spawnFood)
     clock.tick(FPS) # Set the Frames Per Second
 
     # Check to see if the snake has collided with itself, or the wall
