@@ -1,7 +1,8 @@
 import pygame
+BLUE = (0, 0, 255)
 
 class Head(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, WIDTH, HEIGHT):
         pygame.sprite.Sprite.__init__(self)
         # Head Setup
         self.image = pygame.Surface((15, 15)) # Create head with 15 width and height
@@ -37,11 +38,3 @@ class Head(pygame.sprite.Sprite):
             self.speedx = self.vel
             self.speedy = 0
             self.previousDir = "RIGHT"
-
-    def eat(self):
-        global tailSize, tailsX, tailsY
-        tailSize += 1 # Add one to tail size
-        tailsX.append(self.rect.centerx) # Add a element to tails X
-        tailsY.append(self.rect.centery) # Add a element to tails Y
-        tailPiece = Tail(tailsX[1], tailsY[1]) # create new tail piece
-        tailPieces.add(tailPiece) # Add tail piece to the tail group
