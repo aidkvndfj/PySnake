@@ -21,13 +21,13 @@ BLUE = (0, 0, 255)
 
 # Global Variables
 global tailSize, spawnFood, tailsX, tailsY
-tailSize = int(3) # the size of the tail
-spawnFood = bool(False) # weather or not there is a food on screen
+tailSize = 2 # the size of the tail
+spawnFood = False # weather or not there is a food on screen
 tailsX = [] # the x pos of the tail pieces
 tailsY = [] # the y pos of the tail pieces
 
 # Other Variables
-tailNum = int() # The tail number that is being updated
+tailNum = int()
 
 # Initalize Pygame
 pygame.init()
@@ -79,13 +79,13 @@ class Head(pygame.sprite.Sprite):
             self.speedy = 0
             self.previousDir = "RIGHT"
 
-        def eat(self):
-            global tailSize, tailsX, tailsY
-            tailSize += 1 # Add one to tail size
-            tailsX.append(self.rect.centerx) # Add a element to tails X
-            tailsY.append(self.rect.centery) # Add a element to tails Y
-            tailPiece = Tail(blocksX[1], blocksY[1]) # create new tail piece
-            tailPieces.add(tailPiece) # Add tail piece to the tail group
+    def eat(self):
+        global tailSize, tailsX, tailsY
+        tailSize += 1 # Add one to tail size
+        tailsX.append(self.rect.centerx) # Add a element to tails X
+        tailsY.append(self.rect.centery) # Add a element to tails Y
+        tailPiece = Tail(tailsX[1], tailsY[1]) # create new tail piece
+        tailPieces.add(tailPiece) # Add tail piece to the tail group
 
 class Tail(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -99,7 +99,7 @@ class Tail(pygame.sprite.Sprite):
 
     def update(self, x, y, colorScale):
         self.rect.centerx = x # update the x based off given
-        self.rect.cetnery = y # update the y based off given
+        self.rect.centery = y # update the y based off given
         # Scale the color based on where in tail piece is
         self.image.fill((255.0 / ((colorScale + 2) / 1), 255.0 / ((colorScale + 2) / 1.2), 255.0 / ((colorScale + 2) / 2)))
 
@@ -113,20 +113,23 @@ class Food(pygame.sprite.Sprite):
         self.rect.centerx = x # Set the x to given x
         self.rect.centery = y # Set the y to given y
 
-        def ate(self):
-            global spawnFood
-            spawnFood = False # There is no longer a food spawned
-            self.kill() # Kill the current food
+    def ate(self):
+        global spawnFood
+        spawnFood = False # There is no longer a food spawned
+        self.kill() # Kill the current food
 
 #~~~~~~~ Sprites Init ~~~~~~~#
 # Sprite Groups
 tailPieces = pygame.sprite.Group()
+allSprites = pygame.sprite.Group()
 
 # Sprites
 head = Head() # The head of the sanke
+allSprites.add(head)
+
 for i in range(tailSize): # Make the tail
     tailsX.append(head.rect.centerx + ((i + 1) * 20))
-    tailsY.append(head.rect.centerx + ((i + 1) * 20))
+    tailsY.append(head.rect.centery)
     tailPiece = Tail(tailsX[i], tailsY[i])
     tailPieces.add(tailPiece)
 
@@ -154,41 +157,45 @@ while (running):
             if (key[pygame.K_RIGHT]): # If right move right
                 head.move("RIGHT")
 
-        # Edit Tail Positions
-        for i in range(tailPieces): # Repeats based off how many tail pieces there are
-            if (i < tailPieces - 1): # while i is 1 less than the number of tail pieces
-                tailsX[(tailPieces - 1) - i] = tailsX[(tailPieces - 1) - (i + 1)] # Take one elenemt and move it to the right
-                tailsY[(tailPieces - 1) - i] = tailsX[(tailPieces - 1) - (i + 1)] # Take one elenemt and move it to the right
-            else:
-                tailsX[0] = head.rect.centerx # Set the first element to the new x
-                tailsY[0] = head.rect.centery # Set the first element to the new y
+    # Edit Tail Positions
+    for i in range(tailSize): # Repeats based off how many tail pieces there are
+        if (i < tailSize - 1): # while i is 1 less than the number of tail pieces
+            tailsX[(tailSize - 1) - i] = tailsX[(tailSize - 1) - (i + 1)] # Take one elenemt and move it to the right
+            tailsY[(tailSize - 1) - i] = tailsY[(tailSize - 1) - (i + 1)] # Take one elenemt and move it to the right
+        else:
+            tailsX[0] = head.rect.centerx # Set the first element to the new x
+            tailsY[0] = head.rect.centery # Set the first element to the new y
 
-        # Update Tail Posiiton
-        tailNum = 0 # Set the tail it is updating to 0 (a.k.a 1)
-        for i in tailPieces: # for however many tail pieces there are
-            i.update(tailsX[tailNum], tailsY[tailNum], tailnum) # Update the Tail
-            tailNum += 1 # Go on to the next tail piece
+    # Update Tail Posiiton
+    tailNum = 0 # Set the tail it is updating to 0 (a.k.a 1)
+    for i in tailPieces: # for however many tail pieces there are
+        i.update(tailsX[tailNum], tailsY[tailNum], tailNum) # Update the Tail
+        tailNum += 1 # Go on to the next tail piece
 
-        # Spawn Food
-        if (not spawnFood): # If there is no food on screen
-            # Make a food at a random x and y, that is 1 grid away from the wall, and step 20 so that it is always in line with the snake
-            food = Food(random.randrange(20, WIDTH - 20, 20), random.randrange(20, HEIGHT - 20, 20))
+    # Updates the head
+    allSprites.update()
 
-        # Check for food eaten
-        if (pygame.sprite.collide_rect(head, food) == 1): # If the head is colliding with a food
-            food.ate() # Get rid of food
-            head.eat() # Add 1 to tail
+    # Spawn Food
+    if (not spawnFood): # If there is no food on screen
+        # Make a food at a random x and y, that is 1 grid away from the wall, and step 20 so that it is always in line with the snake
+        food = Food(random.randrange(20, WIDTH - 20, 20), random.randrange(20, HEIGHT - 20, 20))
+        allSprites.add(food)
+        spawnFood = True
 
-        # Update the heads pos
-        head.update()
+    # Check for food eaten
+    if (pygame.sprite.collide_rect(head, food) == 1): # If the head is colliding with a food
+        food.ate() # Get rid of food
+        head.eat() # Add 1 to tail
 
 
-        screen.fill(BLACK) # Gets rid of everything on the screen
-        head.draw(screen) # Draws the head
-        food.draw(screen) # Draws the food
-        blocks.draw(screen) # Draws the blocks
 
-        pygame.dispaly.flip() # Flips the display to show new frame
+    # Draw Frame
+    screen.fill(BLACK) # Gets rid of everything on the screen
+    allSprites.draw(screen) # Draws the head
+    tailPieces.draw(screen) # Draws the blocks
+
+    # Show Frame
+    pygame.display.flip() # Flips the display to show new frame
 
 # Quit out of pygame
 pygame.quit()
