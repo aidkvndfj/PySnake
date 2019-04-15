@@ -16,4 +16,4 @@ class Tail(pygame.sprite.Sprite):
         self.rect.centerx = x # update the x based off given
         self.rect.centery = y # update the y based off given
         # Scale the color based on where in tail piece is
-        self.image.fill((255.0 / ((colorScale + 2) / 1), 255.0 / ((colorScale + 2) / 1.2), 255.0 / ((colorScale + 2) / 2)))
+        self.image.fill((0, 0, 255 / ((colorScale * 0.1) + 1)))
