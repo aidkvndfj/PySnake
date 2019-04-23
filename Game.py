@@ -17,7 +17,7 @@ from FoodClass import *
 # Constants
 WIDTH = 600 # Width of screen
 HEIGHT = 400 # Height of screen
-FPS = 7 # frames per second
+FPS = 10 # frames per second
 
 # Define The Colors
 BLACK = (0, 0, 0)
